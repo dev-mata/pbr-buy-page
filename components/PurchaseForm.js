@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
+import useDebounce from "../hooks/useDebounce"
 
 import Image from "next/image";
 import tonIcon from "../public/assets/tonIcon.svg"
@@ -15,10 +16,12 @@ import dropdownIcon from "../public/assets/dropdown.svg"
 
 
 import { erc20ABI } from "../lib/abis"
+import { convertPbrPurchase } from "../lib/api"
 
+import { useAccount, useBalance, useReadContract } from 'wagmi';
 
-import { useAccount, useBalance, useReadContract, useNetwork } from 'wagmi';
-
+const USDT_DECIMALS = 6;
+const DEBOUNCE_DELAY = 500;
 const USDT_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_USDT_SEPOLIA_CONTRACT_ADDRESS
 
 export default function PurchaseForm() {
@@ -27,8 +30,11 @@ export default function PurchaseForm() {
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const [purchaseAmount, setpurchaseAmount] = useState('');
-    const [pbrAmount, setPbrAmount] = useState('');
+    const [purchaseAmount, setPurchaseAmount] = useState(0);
+    const debouncedAmount = useDebounce(purchaseAmount, 500);
+    const [currency] = useState('usdt');
+    const phase = useState(1);
+    const [pbrAmount, setPbrAmount] = useState(0);
 
     const [usdtBalance, setUsdtBalance] = useState(null);
     const isSepolia = chain?.id === process.env.NEXT_PUBLIC_USDT_SEPOLIA_CHAIN_ID;
@@ -39,7 +45,7 @@ export default function PurchaseForm() {
     });
 
 
-    // Getting Token
+
     const { data: tokenNameData } = useReadContract({
         address: USDT_CONTRACT_ADDRESS,
         abi: erc20ABI,
@@ -56,38 +62,59 @@ export default function PurchaseForm() {
         enabled: isSepolia && isConnected,
     });
 
+
     const formatUSDTInteger = (value) => {
-        // Convert the value, divide by 10^6, and format with commas (no decimals)
         return new Intl.NumberFormat('en-US', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
-        }).format(Math.floor(Number(value) / 10 ** 12)); // Use Math.floor to remove decimal places
+        }).format(Math.floor(Number(value) / 10 ** 12));
     };
+
 
     const toggleDropdown = () => {
         setIsDropdownOpen((prev) => !prev);
     };
 
 
-    // Format USDT balance and store it in state
+
+    useEffect(() => {
+        const fetchPbrAmount = async () => {
+            if (debouncedAmount > 0) {
+                try {
+                    const result = await convertPbrPurchase(1, 'usdt', debouncedAmount);
+                    setPbrAmount(result.data.bprTokens);
+                } catch (error) {
+                    console.error('Error during purchase:', error);
+                }
+            }
+        };
+        fetchPbrAmount();
+    }, [debouncedAmount]);
+
+    const handlePurchaseAmountChange = (e) => {
+        setPurchaseAmount(e.target.value);
+    };
+
+
+
     useEffect(() => {
         if (usdtData) {
-            const formattedBalance = Number(usdtData) / 10 ** 6; // USDT has 6 decimals
+            const formattedBalance = Number(usdtData) / 10 ** USDT_DECIMALS;
             const usdtNumberBalance = formatUSDTInteger(formattedBalance)
             setUsdtBalance(usdtNumberBalance);
-            console.log("Formatted USDT Balance:", usdtNumberBalance); // Log the formatted value before setting the state
+            console.log("Formatted USDT Balance:", usdtNumberBalance);
         }
     }, [usdtData]);
 
     useEffect(() => {
         if (tokenNameData) {
-            setTokenName(tokenNameData); // Set the token name (e.g., "Tether USD")
+            setTokenName(tokenNameData);
         }
     }, [tokenNameData]);
 
 
     if (!chain || !chain.name) {
-        return <p className="text-2xl text-black font-londrina">No network connected</p>; // Display message if no chain is connected
+        return <p className="text-2xl text-black font-londrina">No network connected</p>;
     }
 
 
@@ -129,7 +156,7 @@ export default function PurchaseForm() {
                         <input
                             type="number"
                             className="mt-1 w-full pl-10 pr-2 py-3 border-solid border-black border-2 rounded-xl bg-white text-black text-right text-xl"
-                            onChange={(e) => setpurchaseAmount(e.target.value)}
+                            onChange={handlePurchaseAmountChange}
                         />
                         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
                             <Image
@@ -189,7 +216,7 @@ export default function PurchaseForm() {
                         <input
                             type="text"
                             className="mt-1 w-full pl-10 pr-2 py-3 border-solid border-black border-2 rounded-xl bg-white text-black text-right text-xl"
-                            value="999,999,999"
+                            value={pbrAmount}
                             readOnly
                         />
                         <Image
@@ -202,7 +229,7 @@ export default function PurchaseForm() {
 
 
                 {/* Conversion Rate */}
-                <p className="text-sm text-white text-right mr-2">1 PBR = 0.0000025 TON</p>
+                <p className="text-sm text-white text-right mr-2 "> 1 PBR = 0.000003 ETH</p>
 
                 {/* Buy Button */}
                 <button type="submit" className="w-full  bg-pbr-yellow-dark hover:bg-yellow-600 text-black px-2 py-3 text-lg border-solid border-black border-2 rounded-xl font-bold">
@@ -239,4 +266,3 @@ export const getTokenIcon = (tokenName) => {
 
 
 
- 

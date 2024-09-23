@@ -22,8 +22,8 @@ export default function WalletConnectButton() {
     // Function to call the API with the wallet address and signature using Axios
     const authenticateMetaMask = async (walletAddress, signature) => {
         try {
-            const response = await axios.post('http://3.64.47.183:3000/api/authenticateMetaMask', {
-                walletAddress,
+            const response = await axios.post('https://api-buy.pumpingbear.com/api/authenticateMetaMask', {
+                address,
                 signature
             });
 
