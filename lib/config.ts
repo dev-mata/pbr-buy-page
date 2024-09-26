@@ -1,6 +1,7 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi";
 import { cookieStorage, createStorage } from "wagmi";
-import { bsc, mainnet, sepolia, polygon } from 'wagmi/chains'
+import { http, createConfig } from '@wagmi/core'
+import { bsc, mainnet, sepolia, polygon } from '@wagmi/core/chains'
 
 export const projectId = process.env.WALLET_CONNECT_API_KEY || '5dd9b369ae173a94f01e196fa27a067f';
  
@@ -14,10 +15,13 @@ const metadata = {
 
 export const config = defaultWagmiConfig({
   chains: [sepolia,mainnet, bsc, polygon],
+  transports: {
+    [mainnet.id]: http(),
+    [sepolia.id]: http(),
+    [bsc.id]: http(),
+  },
   projectId,
   metadata,
   ssr: true,
-  storage: createStorage({
-    storage: cookieStorage,
-  }),
+
 });

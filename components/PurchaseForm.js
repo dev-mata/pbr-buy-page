@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import useDebounce from "../hooks/useDebounce"
 import PurchaseButton from "../components/PurchaseButton"
 
+
+
 import Image from "next/image";
 import tonIcon from "../public/assets/tonIcon.svg"
 import pbrIcon from "../public/assets/pbrIcon.png"
@@ -55,7 +57,7 @@ export default function PurchaseForm() {
         enabled: selectedToken === 'usdt' && isSepolia && isConnected,  // Only fetch when USDT is selected
     });
 
- 
+
     const { data: tokenNameData } = useReadContract({
         address: USDT_CONTRACT_ADDRESS,
         abi: erc20ABI,
@@ -92,15 +94,15 @@ export default function PurchaseForm() {
         setPbrAmount(0)
     };
 
- 
+
     useEffect(() => {
         if (selectedToken === 'eth' && ethBalance) {
-            setBalance(ethBalance.formatted);  
+            setBalance(ethBalance.formatted);
             setTokenName('ETH');
         } else if (selectedToken === 'usdt' && usdtBalance) {
             const formattedUSDTBalance = Number(usdtBalance) / 10 ** USDT_DECIMALS;
             const usdtNumberBalance = formatUSDTInteger(formattedUSDTBalance);
-            setBalance(usdtNumberBalance);  
+            setBalance(usdtNumberBalance);
             setTokenName('USDT');
         }
     }, [selectedToken, ethBalance, usdtBalance]);
@@ -171,7 +173,7 @@ export default function PurchaseForm() {
                     <label className="block text-xl font-medium">Amount</label>
                     <div className="relative">
                         <input
-                        value={purchaseAmount}
+                            value={purchaseAmount}
                             type="number"
                             className="mt-1 w-full pl-10 pr-2 py-3 border-solid border-black border-2 rounded-xl bg-white text-black text-right text-xl"
                             onChange={(e) => setPurchaseAmount(e.target.value)}
@@ -213,32 +215,34 @@ export default function PurchaseForm() {
 
                 {/* Total */}
                 <div className="relative">
-                    
+
                     <div className="relative">
-                    <label className="block text-xl font-medium">Total</label>
-                    <div className="relative">
-                        <input
-                            type="text"
-                            className="mt-1 w-full pl-10 pr-2 py-3 border-solid border-black border-2 rounded-xl bg-white text-black text-right text-xl"
-                            value={pbrAmount}
-                            readOnly
-                        />
-                        <Image
-                            src={pbrIcon}
-                            alt="Crypto Logo"
-                            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-6 h-6"
-                        />
+                        <label className="block text-xl font-medium">Total</label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                className="mt-1 w-full pl-10 pr-2 py-3 border-solid border-black border-2 rounded-xl bg-white text-black text-right text-xl"
+                                value={pbrAmount}
+                                readOnly
+                            />
+                            <Image
+                                src={pbrIcon}
+                                alt="Crypto Logo"
+                                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-6 h-6"
+                            />
+                        </div>
                     </div>
-                </div>
                 </div>
 
                 <p className="text-sm text-white text-right mr-2">1 PBR = 0.000003 ETH</p>
 
                 <PurchaseButton
-          purchaseAmount={purchaseAmount}
-          selectedToken={selectedToken}
-          recipientAddress={recipientAddress} // You can set the actual recipient address
-        />
+                    purchaseAmount={purchaseAmount}
+                    selectedToken={selectedToken}
+                    recipientAddress={recipientAddress} // You can set the actual recipient address
+                />
+
+             
             </form>
         </div>
     )
