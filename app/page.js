@@ -8,7 +8,6 @@ import bearIcon from "../public/assets/bearIcon.svg"
 import PurchaseForm from "../components/PurchaseForm"
 
 
-
 export default function Home() {
 
 

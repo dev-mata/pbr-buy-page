@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import useDebounce from "../hooks/useDebounce"
+import PurchaseButton from "../components/PurchaseButton"
 
 import Image from "next/image";
 import tonIcon from "../public/assets/tonIcon.svg"
@@ -14,7 +15,6 @@ import noNetworkIcon from "../public/assets/noNetwork.svg"
 import sepoliaIcon from "../public/assets/sepoliaIcon.svg"
 import dropdownIcon from "../public/assets/dropdown.svg"
 
-
 import { erc20ABI } from "../lib/abis"
 import { convertPbrPurchase } from "../lib/api"
 
@@ -23,29 +23,39 @@ import { useAccount, useBalance, useReadContract } from 'wagmi';
 const USDT_DECIMALS = 6;
 const DEBOUNCE_DELAY = 500;
 const USDT_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_USDT_SEPOLIA_CONTRACT_ADDRESS
+const recipientAddress = process.env.NEXT_PUBLIC_ETH_SEPOLIA_MASTER_WALLET //create network condition here
 
 export default function PurchaseForm() {
-    const { chain, chains, address, isConnected } = useAccount();
-    const [tokenName, setTokenName] = useState('');
+    const { chain, address, isConnected } = useAccount();
+    const [tokenName, setTokenName] = useState('USDT');
+    const [selectedToken, setSelectedToken] = useState('usdt');
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const [purchaseAmount, setPurchaseAmount] = useState(0);
     const debouncedAmount = useDebounce(purchaseAmount, 500);
-    const [currency] = useState('usdt');
-    const phase = useState(1);
-    const [pbrAmount, setPbrAmount] = useState(0);
 
-    const [usdtBalance, setUsdtBalance] = useState(null);
+    const [pbrAmount, setPbrAmount] = useState(0);
+    const [balance, setBalance] = useState(null);  // State to store balance
+
     const isSepolia = chain?.id === process.env.NEXT_PUBLIC_USDT_SEPOLIA_CHAIN_ID;
 
+    // Fetch ETH balance
     const { data: ethBalance } = useBalance({
         address,
-        enabled: isSepolia && isConnected,
+        enabled: selectedToken === 'eth' && isConnected,  // Only fetch when ETH is selected
     });
 
+    // Fetch USDT balance
+    const { data: usdtBalance } = useReadContract({
+        address: USDT_CONTRACT_ADDRESS,
+        abi: erc20ABI,
+        functionName: 'balanceOf',
+        args: [address],
+        enabled: selectedToken === 'usdt' && isSepolia && isConnected,  // Only fetch when USDT is selected
+    });
 
-
+ 
     const { data: tokenNameData } = useReadContract({
         address: USDT_CONTRACT_ADDRESS,
         abi: erc20ABI,
@@ -75,13 +85,32 @@ export default function PurchaseForm() {
         setIsDropdownOpen((prev) => !prev);
     };
 
+    const handleTokenSelection = (token) => {
+        setSelectedToken(token);
+        setIsDropdownOpen(false);
+        setPurchaseAmount(0)
+        setPbrAmount(0)
+    };
+
+ 
+    useEffect(() => {
+        if (selectedToken === 'eth' && ethBalance) {
+            setBalance(ethBalance.formatted);  
+            setTokenName('ETH');
+        } else if (selectedToken === 'usdt' && usdtBalance) {
+            const formattedUSDTBalance = Number(usdtBalance) / 10 ** USDT_DECIMALS;
+            const usdtNumberBalance = formatUSDTInteger(formattedUSDTBalance);
+            setBalance(usdtNumberBalance);  
+            setTokenName('USDT');
+        }
+    }, [selectedToken, ethBalance, usdtBalance]);
 
 
     useEffect(() => {
         const fetchPbrAmount = async () => {
             if (debouncedAmount > 0) {
                 try {
-                    const result = await convertPbrPurchase(1, 'usdt', debouncedAmount);
+                    const result = await convertPbrPurchase(1, selectedToken, debouncedAmount);
                     setPbrAmount(result.data.bprTokens);
                 } catch (error) {
                     console.error('Error during purchase:', error);
@@ -91,26 +120,14 @@ export default function PurchaseForm() {
         fetchPbrAmount();
     }, [debouncedAmount]);
 
-    const handlePurchaseAmountChange = (e) => {
-        setPurchaseAmount(e.target.value);
-    };
-
-
-
-    useEffect(() => {
-        if (usdtData) {
-            const formattedBalance = Number(usdtData) / 10 ** USDT_DECIMALS;
-            const usdtNumberBalance = formatUSDTInteger(formattedBalance)
-            setUsdtBalance(usdtNumberBalance);
-            console.log("Formatted USDT Balance:", usdtNumberBalance);
-        }
-    }, [usdtData]);
 
     useEffect(() => {
         if (tokenNameData) {
             setTokenName(tokenNameData);
         }
     }, [tokenNameData]);
+
+
 
 
     if (!chain || !chain.name) {
@@ -154,27 +171,21 @@ export default function PurchaseForm() {
                     <label className="block text-xl font-medium">Amount</label>
                     <div className="relative">
                         <input
+                        value={purchaseAmount}
                             type="number"
                             className="mt-1 w-full pl-10 pr-2 py-3 border-solid border-black border-2 rounded-xl bg-white text-black text-right text-xl"
-                            onChange={handlePurchaseAmountChange}
+                            onChange={(e) => setPurchaseAmount(e.target.value)}
                         />
                         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
                             <Image
-                                src={tokenIcon}
+                                src={selectedToken === 'usdt' ? usdtIcon : ethIcon}
                                 width={20}
                                 height={20}
-                                alt="Crypto Logo"
+                                alt="Token Logo"
                                 className="w-6 h-6 cursor-pointer"
                                 onClick={toggleDropdown}
                             />
-                            <Image
-                                src={dropdownIcon}
-                                alt="Dropdown Icon"
-                                className="cursor-pointer"
-                                onClick={toggleDropdown}
-                            />
                         </div>
-
 
                         {/* Dropdown */}
                         {isDropdownOpen && (
@@ -182,35 +193,28 @@ export default function PurchaseForm() {
                                 <ul className="p-2">
                                     <li
                                         className="py-2 px-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-                                        onClick={() => console.log('Option 1 selected')}
+                                        onClick={() => handleTokenSelection('eth')}
                                     >
-                                        <span className="ml-2">
-                                            <Image src={ethIcon} width={20} height={20} alt="Ethereum Icon" />
-                                        </span>
-
-                                        <span>Ethereum</span>
-
+                                        <span>Ethereum (ETH)</span>
                                     </li>
                                     <li
                                         className="py-2 px-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-                                        onClick={() => console.log('Option 1 selected')}
+                                        onClick={() => handleTokenSelection('usdt')}
                                     >
-                                        <span className="ml-2">
-                                            <Image src={usdtIcon} width={20} height={20} alt="Ethereum Icon" />
-                                        </span>
-
-                                        <span>USDT (ERC-20) </span>
-
+                                        <span>USDT (ERC-20)</span>
                                     </li>
-
                                 </ul>
                             </div>
                         )}
                     </div>
-                    <p className="text-sm text-white text-right mr-2">{usdtBalance} {tokenName}</p>
+                    {/* Display the balance */}
+                    <p className="text-sm text-white text-right mr-2">{balance} {tokenName}</p>
                 </div>
 
+                {/* Total */}
                 <div className="relative">
+                    
+                    <div className="relative">
                     <label className="block text-xl font-medium">Total</label>
                     <div className="relative">
                         <input
@@ -226,15 +230,15 @@ export default function PurchaseForm() {
                         />
                     </div>
                 </div>
+                </div>
 
+                <p className="text-sm text-white text-right mr-2">1 PBR = 0.000003 ETH</p>
 
-                {/* Conversion Rate */}
-                <p className="text-sm text-white text-right mr-2 "> 1 PBR = 0.000003 ETH</p>
-
-                {/* Buy Button */}
-                <button type="submit" className="w-full  bg-pbr-yellow-dark hover:bg-yellow-600 text-black px-2 py-3 text-lg border-solid border-black border-2 rounded-xl font-bold">
-                    BUY $PBR
-                </button>
+                <PurchaseButton
+          purchaseAmount={purchaseAmount}
+          selectedToken={selectedToken}
+          recipientAddress={recipientAddress} // You can set the actual recipient address
+        />
             </form>
         </div>
     )
