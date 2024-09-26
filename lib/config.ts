@@ -14,7 +14,7 @@ const metadata = {
 };
 
 export const config = defaultWagmiConfig({
-  chains: [sepolia,mainnet, bsc, polygon],
+  chains: [sepolia, mainnet, bsc, polygon],
   transports: {
     [mainnet.id]: http(),
     [sepolia.id]: http(),
@@ -25,3 +25,13 @@ export const config = defaultWagmiConfig({
   ssr: true,
 
 });
+
+export const config2 = createConfig({
+  chains: [mainnet, sepolia],
+  ssr: true,
+  transports: {
+    [mainnet.id]: http(),
+    [sepolia.id]: http(),
+  },
+})
+

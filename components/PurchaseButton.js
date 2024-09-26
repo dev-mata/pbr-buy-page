@@ -1,13 +1,17 @@
 
-import React, { useEffect } from 'react';
+import React, { useState ,useEffect } from 'react';
 
-import { sendTransaction, prepareWriteContract, writeContract } from '@wagmi/core';
-import { useWriteContract } from 'wagmi'
+import { sendTransaction, prepareWriteContract } from '@wagmi/core';
+import { useWriteContract, useAccount } from 'wagmi'
+import { simulateContract, writeContract } from '@wagmi/core'
+
 import { erc20ABI, abi } from '../lib/abis';
-import { config } from '../lib/config';
+import { erc20Abi } from 'viem';
+import { config, config2 } from '../lib/config';
 import { parseEther } from 'viem'
+import { sepolia } from 'wagmi/chains'
 
-const USDT_ABI = [
+const ERC20_ABI =[
   {
     type: 'function',
     name: 'approve',
@@ -19,23 +23,24 @@ const USDT_ABI = [
     outputs: [{ type: 'bool' }],
   },
   {
-    type: 'function',
-    name: 'transferFrom',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: 'sender', type: 'address' },
-      { name: 'recipient', type: 'address' },
-      { name: 'amount', type: 'uint256' },
+    "constant": false,
+    "inputs": [
+      { "name": "from", "type": "address" },
+      { "name": "to", "type": "address" },
+      { "name": "value", "type": "uint256" }
     ],
-    outputs: [{ type: 'bool' }],
+    "name": "transferFrom",
+    "outputs": [{ "name": "", "type": "bool" }],
+    "type": "function"
   },
 ];
 
 export default function PurchaseButton({ purchaseAmount, selectedToken, recipientAddress }) {
   const USDT_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_USDT_CONTRACT_ADDRESS; // Set your USDT contract address here
 
-  const { writeContract } = useWriteContract()
-
+  const [transactionHash, setTransactionHash] = useState(null);
+  const { data, error, isLoading } = useWriteContract();
+  const { address } = useAccount();
 
 
   const handleSendEthTransaction = async () => {
@@ -50,22 +55,45 @@ export default function PurchaseButton({ purchaseAmount, selectedToken, recipien
     }
   };
 
-  useEffect(() => {
-    console.log("loaded")
-    writeContract({
-      USDT_ABI,
-      address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-      functionName: 'transferFrom',
-      args: [
-        '0xd2135CfB216b74109775236E36d4b433F1DF507B',
-        '0xA0Cf798816D4b9b9866b5330EEa46a18382f251e',
-        123n,
-      ],
-    });
-  }, []); // Empty dependency array to run only once when the component mounts.
 
 
+  const handleWriteContract = async () => {
+    console.log("accountaccount", address)
+    if (recipientAddress) {
+        try {
+          const { request } = await simulateContract(config2, {
+            ERC20_ABI,
+            address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+            functionName: 'transferFrom',
+            args: [
+              '0xd2135CfB216b74109775236E36d4b433F1DF507B',
+              '0xA0Cf798816D4b9b9866b5330EEa46a18382f251e',
+              123n,
+            ],
+            chainId: sepolia.id, 
+          })
+          const hash = await writeContract(config, request)
+            console.log("Contract write successful! Hash:", hash);
+        } catch (error) {
+            console.error("Error writing to contract:", error);
+        }
+    }
+};
 
+
+  const handleSendUSDTTransaction = async () => {
+    console.log("clicked");
+
+    try {
+      const result = await writeContract();
+      console.log('Transaction sent:', result);
+      setTransactionHash(result?.hash);
+    } catch (e) {
+      console.error('Error sending transaction:', e);
+    }
+  };
+
+  
   const handleBuyClick = () => {
     if (selectedToken === 'eth') {
     
@@ -73,7 +101,7 @@ export default function PurchaseButton({ purchaseAmount, selectedToken, recipien
       handleSendEthTransaction();
     } else if (selectedToken === 'usdt') {
       
-      handleSendUSDTTransaction();
+      handleWriteContract();
     }
   };
 
