@@ -8,7 +8,7 @@ import Header from "../components/Header"
 import { headers } from 'next/headers'
 import { cookieToInitialState } from "wagmi";
 
-import {config} from '../lib/config'
+import {config2} from '../lib/config'
 import Web3ModalProvider from '../lib/wagmi-provider'
 
 
@@ -37,7 +37,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  const initialState = cookieToInitialState(config, headers().get('cookie'))
+  const initialState = cookieToInitialState(config2, headers().get('cookie'))
 
   return (
     <html lang="en" className={londrina.variable}>

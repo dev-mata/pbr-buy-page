@@ -1,7 +1,9 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi";
 import { cookieStorage, createStorage } from "wagmi";
 import { http, createConfig } from '@wagmi/core'
-import { bsc, mainnet, sepolia, polygon } from '@wagmi/core/chains'
+import { bsc, polygon } from '@wagmi/core/chains'
+import { mainnet, sepolia } from 'wagmi/chains'
+import { walletConnect } from 'wagmi/connectors'
 
 export const projectId = process.env.WALLET_CONNECT_API_KEY || '5dd9b369ae173a94f01e196fa27a067f';
  
@@ -23,15 +25,19 @@ export const config = defaultWagmiConfig({
   projectId,
   metadata,
   ssr: true,
-
 });
 
 export const config2 = createConfig({
   chains: [mainnet, sepolia],
   ssr: true,
+  connectors: [
+    walletConnect({
+      projectId: '5dd9b369ae173a94f01e196fa27a067f',
+    }),
+  ],
   transports: {
     [mainnet.id]: http(),
-    [sepolia.id]: http(),
+    [sepolia.id]: http('https://rpc2.sepolia.org'),
   },
 })
 
