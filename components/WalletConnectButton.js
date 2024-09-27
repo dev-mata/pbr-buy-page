@@ -13,8 +13,8 @@ export default function WalletConnectButton() {
     const { walletInfo } = useWalletInfo()
 
     const { open } = useWeb3Modal();
-    const { address, isConnected } = useAccount(); // Wallet information
-    const { signMessageAsync } = useSignMessage(); // For signing the message
+    const { address, isConnected } = useAccount(); 
+    const { signMessageAsync } = useSignMessage(); 
     const [signature, setSignature] = useState("");
     const [walletAddress, setWalletAddress] = useState("");
 
@@ -23,7 +23,7 @@ export default function WalletConnectButton() {
     const authenticateMetaMask = async (walletAddress, signature) => {
         try {
             const response = await axios.post('https://api-buy.pumpingbear.com/api/authenticateMetaMask', {
-                address,
+                walletAddress,
                 signature
             });
 
