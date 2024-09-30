@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 
 import { useWeb3Modal, useWalletInfo } from "@web3modal/wagmi/react";
 import { useAccount, useSignMessage } from 'wagmi';
-import axios from 'axios';
-
+import { authenticateMetaMask } from "../lib/api"
 
 import Image from 'next/image';
 
@@ -13,55 +12,47 @@ export default function WalletConnectButton() {
     const { walletInfo } = useWalletInfo()
 
     const { open } = useWeb3Modal();
-    const { address, isConnected } = useAccount(); 
-    const { signMessageAsync } = useSignMessage(); 
+    const { address, isConnected } = useAccount();
+    const { signMessageAsync } = useSignMessage();
     const [signature, setSignature] = useState("");
     const [walletAddress, setWalletAddress] = useState("");
 
+    const [webToken, setWebToken] = useState("");
 
-    // Function to call the API with the wallet address and signature using Axios
-    const authenticateMetaMask = async (walletAddress, signature) => {
-        try {
-            const response = await axios.post('https://api-buy.pumpingbear.com/api/authenticateMetaMask', {
-                walletAddress,
-                signature
-            });
-
-            setApiResponse(response.data); // Store the API response
-            console.log('API Response:', response.data);
-        } catch (error) {
-            console.error('Error during API call:', error);
-        }
-    };
-
-
-    // This function is called after wallet is connected to sign a message
+    
     const signWallet = async () => {
         const message = `Sign this message to authenticate with MetaMask`;
         try {
             const signatureResult = await signMessageAsync({ message });
-            setSignature(signatureResult); // Set the generated signature
+            setSignature(signatureResult); 
             console.log("Signature:", signatureResult);
 
-            // Call the API after signing the message
-            authenticateMetaMask(walletAddress, signatureResult);
+            
+            const response = await authenticateMetaMask(walletAddress, signatureResult);
+
+            if (response.success) {
+                setWebToken(response.token);
+                localStorage.setItem('authToken', response.token);
+            } else {
+                console.error('Authentication failed.');
+            }
+
         } catch (error) {
             console.error('Error signing message:', error);
         }
-    }; 
+    };
 
-    // When the wallet connects, automatically trigger the signing
+   
     useEffect(() => {
         if (isConnected && address) {
-            setWalletAddress(address); // Store wallet address after connection
-            signWallet(); // Automatically sign after wallet connects
+            setWalletAddress(address); 
+            signWallet(); 
         }
     }, [isConnected, address]);
 
-    // Function to trigger MetaMask connection manually
     const authenticateWallet = async () => {
         if (!isConnected) {
-            await open(); // Opens MetaMask to connect the wallet
+            await open(); 
         }
     };
 

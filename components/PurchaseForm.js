@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import useDebounce from "../hooks/useDebounce"
 import PurchaseButton from "../components/PurchaseButton"
 
-
-
 import Image from "next/image";
 import tonIcon from "../public/assets/tonIcon.svg"
 import pbrIcon from "../public/assets/pbrIcon.png"
@@ -242,7 +240,7 @@ export default function PurchaseForm() {
                     recipientAddress={recipientAddress} // You can set the actual recipient address
                 />
 
-             
+
             </form>
         </div>
     )
