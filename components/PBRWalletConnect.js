@@ -1,5 +1,5 @@
 import { TonConnectButton, useTonAddress, useTonWallet, useIsConnectionRestored, useTonConnectUI  } from "@tonconnect/ui-react"
-import { TonConnect } from '@tonconnect/sdk';
+
 
 
 import Image from "next/image";
@@ -9,16 +9,12 @@ import pbrIcon from "../public/assets/pbrIcon.png"
 
 export default function PBRWalletConnect() {
 
-    const tonConnect = new TonConnect();
-
 
     const tonAddress = useTonAddress();
     const tonWallet = useTonWallet();
 
     const [tonConnectUI] = useTonConnectUI();
     
-
-
 
     console.log("tonAddress----", tonAddress)
     console.log("tonWallet----", tonWallet)
