@@ -1,23 +1,51 @@
 import { TonConnectButton, useTonAddress, useTonWallet, useIsConnectionRestored, useTonConnectUI  } from "@tonconnect/ui-react"
-
+import { TonConnect } from '@tonconnect/sdk';
 
 
 import Image from "next/image";
 import pbrIcon from "../public/assets/pbrIcon.png"
 
-import '../styles/TonConnectButtonStyles.css';
-
 
 
 export default function PBRWalletConnect() {
+
+    const tonConnect = new TonConnect();
+
 
     const tonAddress = useTonAddress();
     const tonWallet = useTonWallet();
 
     const [tonConnectUI] = useTonConnectUI();
+    
+
+
 
     console.log("tonAddress----", tonAddress)
     console.log("tonWallet----", tonWallet)
+
+
+
+    const handleSignMessage = async () => {
+        const message = 'Sign this message to authenticate with TON Wallet';
+        const messageBuffer = new TextEncoder().encode(message);
+        try {
+            const signedData = await tonConnectUI.sendTransaction({
+                validUntil: Math.round(Date.now() / 1000) + 60, // Timeout for the transaction
+                messages: [
+                  {
+                    address: tonAddress,
+                    data: messageBuffer,
+                  },
+                ],
+              });
+
+              console.log('Signed data:', signedData);
+
+        } catch (error) {
+            console.error('Error signing message:', error);
+          }
+    }
+
 
 
 
@@ -44,8 +72,10 @@ export default function PBRWalletConnect() {
 
             ) : (
               <TonConnectButton  /> 
+              
             )}
 
+<button onClick={handleSignMessage}>Click Meeee</button>
         </div>
 
     )

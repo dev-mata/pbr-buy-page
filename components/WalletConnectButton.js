@@ -18,7 +18,6 @@ export default function WalletConnectButton() {
     const [walletAddress, setWalletAddress] = useState("");
 
     const [webToken, setWebToken] = useState("");
-
     
     const signWallet = async () => {
         const message = `Sign this message to authenticate with MetaMask`;
@@ -26,7 +25,6 @@ export default function WalletConnectButton() {
             const signatureResult = await signMessageAsync({ message });
             setSignature(signatureResult); 
             console.log("Signature:", signatureResult);
-
             
             const response = await authenticateMetaMask(walletAddress, signatureResult);
 
