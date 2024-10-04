@@ -10,7 +10,7 @@ import PurchaseForm from "../components/PurchaseForm"
 import PBRWallet from "../components/PBRWallet"
 import pbrIcon from "../public/assets/pbrIcon.png"
 import { useAccount } from 'wagmi';
-import {fetchUserDashboard} from "../lib/api"
+
 
 
 
@@ -37,19 +37,7 @@ const [dashboardData, setDashboardData] = useState(null);
               <div className="space-y-6 mt-6">
 
               {/* TON Wallet */}
-              <div className="flex items-center ">
-                    <Image src={pbrIcon} alt="pbr-icon" className="w-8 h-8 mr-2 " />
-                    <span className="mr-2">{dashboardData} xxxxPBRWalletHereIfConnected</span>
-                    {/* <button
-                        type="button"
-                        onClick={disconnectPBRWallet}
-                        className="bg-pbr-blue hover:bg-yellow-600 text-white px-1 py-1 text-sm border-solid border-black border-2 rounded-xl font-bold"
-                    >
-                        Disconnect PBR
-                    </button> */}
-                </div>
-
-         
+            
 
                 <div className="flex items-start">
                   <div className="flex-shrink-0">

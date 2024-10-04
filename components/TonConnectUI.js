@@ -2,7 +2,6 @@ import { beginCell, toNano  } from '@ton/ton'
 import { TonConnectButton, useTonAddress, useTonWallet, useIsConnectionRestored, useTonConnectUI } from "@tonconnect/ui-react"
 
 
-
 import Image from "next/image";
 import pbrIcon from "../public/assets/pbrIcon.png"
 
@@ -17,8 +16,8 @@ export default function PBRWalletConnect() {
     const destination = '0QAs-agG3LH1MGHyyiO6CJnCvMpxOChtU0fxXSmznX8WX27F'
     // test message 
     const body = beginCell()
-        .storeUint(0, 32) // write 32 zero bits to indicate that a text comment will follow
-        .storeStringTail("Sign this message to authenticate with TON Wallet") // write our text comment
+        .storeUint(0, 32) 
+        .storeStringTail("Sign this message to authenticate with TON Wallet") 
         .endCell();
 
         const myTransaction = {
@@ -27,7 +26,7 @@ export default function PBRWalletConnect() {
                 {
                     address: destination,
                     amount: toNano("0.000005").toString(),
-                    payload: body.toBoc().toString("base64") // payload with comment in body
+                    payload: body.toBoc().toString("base64") 
                 }
             ]
         }
