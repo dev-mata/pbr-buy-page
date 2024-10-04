@@ -1,23 +1,37 @@
-import { TonConnectButton, useTonAddress, useTonWallet, useIsConnectionRestored, useTonConnectUI  } from "@tonconnect/ui-react"
+import { beginCell, toNano  } from '@ton/ton'
+import { TonConnectButton, useTonAddress, useTonWallet, useIsConnectionRestored, useTonConnectUI } from "@tonconnect/ui-react"
 
 
 
 import Image from "next/image";
 import pbrIcon from "../public/assets/pbrIcon.png"
 
-
-
 export default function PBRWalletConnect() {
 
 
     const tonAddress = useTonAddress();
     const tonWallet = useTonWallet();
+    const [tonConnectUI, setOptions] = useTonConnectUI();
 
-    const [tonConnectUI] = useTonConnectUI();
-    
 
-    console.log("tonAddress----", tonAddress)
-    console.log("tonWallet----", tonWallet)
+    const destination = '0QAs-agG3LH1MGHyyiO6CJnCvMpxOChtU0fxXSmznX8WX27F'
+    // test message 
+    const body = beginCell()
+        .storeUint(0, 32) // write 32 zero bits to indicate that a text comment will follow
+        .storeStringTail("Sign this message to authenticate with TON Wallet") // write our text comment
+        .endCell();
+
+        const myTransaction = {
+            validUntil: Math.floor(Date.now() / 1000) + 360,
+            messages: [
+                {
+                    address: destination,
+                    amount: toNano("0.000005").toString(),
+                    payload: body.toBoc().toString("base64") // payload with comment in body
+                }
+            ]
+        }
+
 
 
 
@@ -28,23 +42,19 @@ export default function PBRWalletConnect() {
             const signedData = await tonConnectUI.sendTransaction({
                 validUntil: Math.round(Date.now() / 1000) + 60, // Timeout for the transaction
                 messages: [
-                  {
-                    address: tonAddress,
-                    data: messageBuffer,
-                  },
+                    {
+                        address: tonAddress,
+                        data: messageBuffer,
+                    },
                 ],
-              });
+            });
 
-              console.log('Signed data:', signedData);
+            console.log('Signed data:', signedData);
 
         } catch (error) {
             console.error('Error signing message:', error);
-          }
+        }
     }
-
-
-
-
 
 
     const disconnectPBRWallet = async () => {
@@ -67,11 +77,11 @@ export default function PBRWalletConnect() {
                 </div>
 
             ) : (
-              <TonConnectButton  /> 
-              
+                <TonConnectButton />
+
             )}
 
-<button onClick={handleSignMessage}>Click Meeee</button>
+            <button onClick={() => tonConnectUI.sendTransaction(myTransaction)}>Click Meeee</button>
         </div>
 
     )

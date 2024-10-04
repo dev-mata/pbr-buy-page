@@ -5,55 +5,53 @@ import { useState, useEffect } from 'react';
 import { useWeb3Modal, useWalletInfo } from "@web3modal/wagmi/react";
 import { useAccount, useSignMessage } from 'wagmi';
 import { authenticateMetaMask } from "../lib/api"
+import { setCookie, deleteCookie } from 'cookies-next';
 
 import Image from 'next/image';
 
-export default function WalletConnectButton() {
+export default function WalletConnectButton({ setSignature }) {
     const { walletInfo } = useWalletInfo()
-
     const { open } = useWeb3Modal();
     const { address, isConnected } = useAccount();
     const { signMessageAsync } = useSignMessage();
-    const [signature, setSignature] = useState("");
+
     const [walletAddress, setWalletAddress] = useState("");
 
-    const [webToken, setWebToken] = useState("");
-    
     const signWallet = async () => {
         const message = `Sign this message to authenticate with MetaMask`;
         try {
+
             const signatureResult = await signMessageAsync({ message });
-            setSignature(signatureResult); 
-            console.log("Signature:", signatureResult);
-            
-            const response = await authenticateMetaMask(walletAddress, signatureResult);
+            setSignature(signatureResult);
+
+            const response = await authenticateMetaMask(address, signatureResult);
 
             if (response.success) {
-                setWebToken(response.token);
-                localStorage.setItem('authToken', response.token);
+                setCookie('authToken', response.token, { maxAge: 60 * 60 * 24, httpOnly: false });
             } else {
                 console.error('Authentication failed.');
             }
-
         } catch (error) {
             console.error('Error signing message:', error);
         }
     };
 
-   
+
     useEffect(() => {
         if (isConnected && address) {
-            setWalletAddress(address); 
-            signWallet(); 
+            setWalletAddress(address);
+            signWallet();
+        } else {
+            // console.log("here no address")
+            // deleteCookie('authToken')
         }
     }, [isConnected, address]);
 
     const authenticateWallet = async () => {
         if (!isConnected) {
-            await open(); 
+            await open();
         }
     };
-
 
 
     return (
@@ -72,10 +70,6 @@ export default function WalletConnectButton() {
                 {isConnected ? `Connected: ${address.slice(0, 6)}...${address.slice(-4)}` : 'Connect Wallet'}
             </span>
         </button>
-
-
-
-
     )
 }
 

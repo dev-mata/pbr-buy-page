@@ -110,8 +110,9 @@ export default function PurchaseForm() {
         const fetchPbrAmount = async () => {
             if (debouncedAmount > 0) {
                 try {
+                  
                     const result = await convertPbrPurchase(1, selectedToken, debouncedAmount);
-                    setPbrAmount(result.data.bprTokens);
+                    setPbrAmount(result.convertedAmount.bprTokens);
                 } catch (error) {
                     console.error('Error during purchase:', error);
                 }
@@ -126,8 +127,6 @@ export default function PurchaseForm() {
             setTokenName(tokenNameData);
         }
     }, [tokenNameData]);
-
-
 
 
     if (!chain || !chain.name) {
