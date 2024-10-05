@@ -13,7 +13,7 @@ export default function PurchaseButton({ purchaseAmount, selectedToken, recipien
   const USDT_MASTER_ADDRESS = process.env.NEXT_PUBLIC_ETH_SEPOLIA_MASTER_WALLET;
 
 
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
 
   const [isPending, setIsPending] = useState(false);
   const [transactionHash, setTransactionHash] = useState("");
@@ -130,9 +130,10 @@ export default function PurchaseButton({ purchaseAmount, selectedToken, recipien
       <button
         type="button"
         onClick={handleBuyClick}
-        className="w-full bg-pbr-yellow-dark hover:bg-yellow-600 text-black px-2 py-3 text-lg border-solid border-black border-2 rounded-xl font-bold"
+        disabled={!isConnected}
+        className={`w-full ${isConnected ? 'bg-pbr-yellow-dark hover:bg-yellow-600' : 'bg-gray-600'}   text-black px-2 py-3 text-lg border-solid border-black border-2 rounded-xl font-bold`}
       >
-        BUY $PBR
+        BUY $PBR 
       </button>
 
       {isPending && <TransactionPendingOverlay/>}

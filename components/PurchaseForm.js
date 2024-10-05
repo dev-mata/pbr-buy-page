@@ -38,6 +38,9 @@ export default function PurchaseForm() {
     const [pbrAmount, setPbrAmount] = useState(0);
     const [balance, setBalance] = useState(null);  // State to store balance
 
+    const [chainIcon, setChainIcon] = useState();
+    
+
     const isSepolia = chain?.id === process.env.NEXT_PUBLIC_USDT_SEPOLIA_CHAIN_ID;
 
     // Fetch ETH balance
@@ -110,7 +113,7 @@ export default function PurchaseForm() {
         const fetchPbrAmount = async () => {
             if (debouncedAmount > 0) {
                 try {
-                  
+
                     const result = await convertPbrPurchase(1, selectedToken, debouncedAmount);
                     setPbrAmount(result.convertedAmount.bprTokens);
                 } catch (error) {
@@ -128,18 +131,12 @@ export default function PurchaseForm() {
         }
     }, [tokenNameData]);
 
-
-    if (!chain || !chain.name) {
-        return <p className="text-2xl text-black font-londrina">No network connected</p>;
-    }
-
-
-    const chainIcon = getChainIcon(chain.name);
-    const tokenIcon = getTokenIcon(tokenName);
-
+    
 
     return (
-        <div className="bg-pbr-blue text-white rounded-2xl p-6 font-londrina font-light">
+       
+        <div className={`bg-pbr-blue text-white rounded-2xl p-6 font-londrina font-light`}>
+
             <h2 className="text-2xl font-bold mb-4">Buy PBR now and start earning!</h2>
             <form className="space-y-4">
                 {/* Payment Method Dropdown */}
@@ -149,13 +146,13 @@ export default function PurchaseForm() {
                         <input
                             type="text"
                             className="mt-1 w-full pl-10 pr-2 py-3 border-solid border-black border-2 rounded-xl bg-white text-black text-xl"
-                            value={chain.name}
+                            value={isConnected ? chain.name : ''}
                             readOnly
                             disabled
                         />
 
                         <Image
-                            src={chainIcon}
+                            src={isConnected ? getChainIcon(chain.name) : noNetworkIcon}
                             width={20}
                             height={20}
                             alt="Crypto Logo"
@@ -174,6 +171,7 @@ export default function PurchaseForm() {
                             type="number"
                             className="mt-1 w-full pl-10 pr-2 py-3 border-solid border-black border-2 rounded-xl bg-white text-black text-right text-xl"
                             onChange={(e) => setPurchaseAmount(e.target.value)}
+                            disabled={isConnected ? false : true}
                         />
                         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
                             <Image
@@ -187,24 +185,28 @@ export default function PurchaseForm() {
                         </div>
 
                         {/* Dropdown */}
-                        {isDropdownOpen && (
-                            <div className="absolute left-2 mt-2 w-48 bg-white text-black shadow-md border border-gray-300 rounded-xl z-10">
-                                <ul className="p-2">
-                                    <li
-                                        className="py-2 px-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-                                        onClick={() => handleTokenSelection('eth')}
-                                    >
-                                        <span>Ethereum (ETH)</span>
-                                    </li>
-                                    <li
-                                        className="py-2 px-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-                                        onClick={() => handleTokenSelection('usdt')}
-                                    >
-                                        <span>USDT (ERC-20)</span>
-                                    </li>
-                                </ul>
-                            </div>
+                        {isConnected && (
+                            isDropdownOpen && (
+                                <div className="absolute left-2 mt-2 w-48 bg-white text-black shadow-md border border-gray-300 rounded-xl z-10">
+                                    <ul className="p-2">
+                                        <li
+                                            className="py-2 px-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+                                            onClick={() => handleTokenSelection('eth')}
+                                        >
+                                            <span>Ethereum (ETH)</span>
+                                        </li>
+                                        <li
+                                            className="py-2 px-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+                                            onClick={() => handleTokenSelection('usdt')}
+                                        >
+                                            <span>USDT (ERC-20)</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            )
+
                         )}
+
                     </div>
                     {/* Display the balance */}
                     <p className="text-sm text-white text-right mr-2">{balance} {tokenName}</p>
