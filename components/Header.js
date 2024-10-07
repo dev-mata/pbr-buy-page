@@ -9,6 +9,7 @@ import PBRWallet from "./PBRWallet";
 export default function Header() {
 
     const [signature, setSignature] = useState("");
+    
 
     const handleSignature = (signatureResult) => {
         setSignature(signatureResult);

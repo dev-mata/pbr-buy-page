@@ -7,8 +7,6 @@ import pbrGuy from "../public/assets/pbr-guy.png"
 import bearIcon from "../public/assets/bearIcon.svg"
 
 import PurchaseForm from "../components/PurchaseForm"
-import PBRWallet from "../components/PBRWallet"
-import pbrIcon from "../public/assets/pbrIcon.png"
 import { useAccount } from 'wagmi';
 
 

@@ -29,20 +29,12 @@ export default function PurchaseButton({ purchaseAmount, selectedToken, recipien
       });
       console.log('Transaction result:', ethTxHash);
 
-
-      console.log("resultETH", result)
-
     } catch (error) {
       console.error('Error sending transaction:', error);
     }
   };
 
  
-
-
-
-
-
 
   const approveUserMaxCap = async () => {
     if (recipientAddress) {

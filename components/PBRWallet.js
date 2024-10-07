@@ -6,6 +6,7 @@ import { getCookie } from "cookies-next";
 
 import Image from "next/image";
 import pbrIcon from "../public/assets/pbrIcon.png"
+import { TransactionPendingOverlay } from "../components/TransactionPendingOverlay";
 
 
 export default function PBRWallet({ signature }) {
@@ -16,15 +17,20 @@ export default function PBRWallet({ signature }) {
     const [metamaskSignature, setmetamaskSignature] = useState("");
 
     const [tonPbrWalletAddress, setTonPbrWalletAddress] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [isCreateWalletPopupOpen, setIsCreateWalletPopupOpen] = useState(false);
+    
 
 
     const handleCreatePBRWallet = async () => {
         try {
+            setIsLoading(true)
             const response = await createTonWallet(metamaskSignature, address, chainNetwork, token)
 
             if (response.success) {
                 console.log("Wallet created successfully", response)
-
+                setIsLoading(false)
+                setIsCreateWalletPopupOpen(true)
                 fetchUserDashboard(token)
                     .then((data) => {
                         const fetchTonWalletAddress = data.data.tonWalletAddress;
@@ -86,8 +92,9 @@ export default function PBRWallet({ signature }) {
 
 
 
-
-
+    if(isLoading) {return(
+        <TransactionPendingOverlay />
+    )}
 
 
     return (
