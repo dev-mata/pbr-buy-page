@@ -15,17 +15,17 @@ const metadata = {
   icons: ["https://cache.tonapi.io/imgproxy/ZGQwJUacuVv2HJlUna2e6-jKHJH1McUBMRoTCNnuR88/rs:fill:200:200:1/g:no/aHR0cHM6Ly9ibGFjay1wZXRpdGUtdGFyc2llci04MC5teXBpbmF0YS5jbG91ZC9pcGZzL1FtV3BleWY2azJRY0JFdTdnYWhlUXRZSHRRdml5VEo0RlE3WUVCVFoza3RCVjc.webp"],
 };
 
-export const config = defaultWagmiConfig({
-  chains: [sepolia, mainnet, bsc, polygon],
-  transports: {
-    [mainnet.id]: http(),
-    [sepolia.id]: http(),
-    [bsc.id]: http(),
-  },
-  projectId,
-  metadata,
-  ssr: true,
-});
+// export const config = defaultWagmiConfig({
+//   chains: [sepolia, mainnet, bsc, polygon],
+//   transports: {
+//     [mainnet.id]: http(),
+//     [sepolia.id]: http(),
+//     [bsc.id]: http(),
+//   },
+//   projectId,
+//   metadata,
+//   ssr: true,
+// });
 
 export const config2 = createConfig({
   chains: [mainnet, sepolia],

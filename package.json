@@ -11,7 +11,6 @@
   "dependencies": {
     "@tanstack/react-query": "^5.56.2",
     "@ton/ton": "^15.0.0",
-    "@tonconnect/ui-react": "^2.0.9",
     "@wagmi/connectors": "^5.1.7",
     "@walletconnect/ethereum-provider": "^2.16.2",
     "@web3modal/wagmi": "^5.1.7",

@@ -38,9 +38,6 @@ export default function PurchaseForm() {
     const [pbrAmount, setPbrAmount] = useState(0);
     const [balance, setBalance] = useState(null);  // State to store balance
 
-    const [chainIcon, setChainIcon] = useState();
-    
-
     const isSepolia = chain?.id === process.env.NEXT_PUBLIC_USDT_SEPOLIA_CHAIN_ID;
 
     // Fetch ETH balance
@@ -97,15 +94,20 @@ export default function PurchaseForm() {
 
 
     useEffect(() => {
-        if (selectedToken === 'eth' && ethBalance) {
-            setBalance(ethBalance.formatted);
-            setTokenName('ETH');
-        } else if (selectedToken === 'usdt' && usdtBalance) {
-            const formattedUSDTBalance = Number(usdtBalance) / 10 ** USDT_DECIMALS;
-            const usdtNumberBalance = formatUSDTInteger(formattedUSDTBalance);
-            setBalance(usdtNumberBalance);
-            setTokenName('USDT');
+        if(isConnected){
+            if (selectedToken === 'eth' && ethBalance) {
+                setBalance(ethBalance.formatted);
+                setTokenName('ETH');
+            } else if (selectedToken === 'usdt' && usdtBalance) {
+                const formattedUSDTBalance = Number(usdtBalance) / 10 ** USDT_DECIMALS;
+                const usdtNumberBalance = formatUSDTInteger(formattedUSDTBalance);
+                setBalance(usdtNumberBalance);
+                setTokenName('USDT');
+            }
+        }else{
+            setBalance(0);
         }
+       
     }, [selectedToken, ethBalance, usdtBalance]);
 
 
@@ -131,10 +133,10 @@ export default function PurchaseForm() {
         }
     }, [tokenNameData]);
 
-    
+
 
     return (
-       
+
         <div className={`bg-pbr-blue text-white rounded-2xl p-6 font-londrina font-light`}>
 
             <h2 className="text-2xl font-bold mb-4">Buy PBR now and start earning!</h2>
@@ -173,14 +175,22 @@ export default function PurchaseForm() {
                             onChange={(e) => setPurchaseAmount(e.target.value)}
                             disabled={isConnected ? false : true}
                         />
-                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1"
+                            onClick={toggleDropdown}>
                             <Image
                                 src={selectedToken === 'usdt' ? usdtIcon : ethIcon}
                                 width={20}
                                 height={20}
                                 alt="Token Logo"
                                 className="w-6 h-6 cursor-pointer"
-                                onClick={toggleDropdown}
+
+                            />
+
+                            <Image src={dropdownIcon}
+                                width={14}
+                                height={14}
+                                alt="Token Logo"
+                                className="cursor-pointer"
                             />
                         </div>
 
@@ -209,6 +219,7 @@ export default function PurchaseForm() {
 
                     </div>
                     {/* Display the balance */}
+
                     <p className="text-sm text-white text-right mr-2">{balance} {tokenName}</p>
                 </div>
 

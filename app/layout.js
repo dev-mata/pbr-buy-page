@@ -10,7 +10,6 @@ import { cookieToInitialState } from "wagmi";
 
 import { config2 } from '../lib/config'
 
-// import { TonConnectUIProvider } from "@tonconnect/ui-react";
 // import Web3ModalProvider from '../lib/wagmi-provider'
 // import Header from "../components/Header"
 

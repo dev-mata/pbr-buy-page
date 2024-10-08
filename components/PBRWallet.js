@@ -7,6 +7,7 @@ import { getCookie } from "cookies-next";
 import Image from "next/image";
 import pbrIcon from "../public/assets/pbrIcon.png"
 import { TransactionPendingOverlay } from "../components/TransactionPendingOverlay";
+import { CreatePBRWallet } from "../components/CreatePBRWallet";
 
 
 export default function PBRWallet({ signature }) {
@@ -18,8 +19,9 @@ export default function PBRWallet({ signature }) {
 
     const [tonPbrWalletAddress, setTonPbrWalletAddress] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+
+    const [walletData, setWalletData] = useState(null);
     const [isCreateWalletPopupOpen, setIsCreateWalletPopupOpen] = useState(false);
-    
 
 
     const handleCreatePBRWallet = async () => {
@@ -28,9 +30,11 @@ export default function PBRWallet({ signature }) {
             const response = await createTonWallet(metamaskSignature, address, chainNetwork, token)
 
             if (response.success) {
-                console.log("Wallet created successfully", response)
+                console.log("Wallet created successfully")
+                setWalletData(response.mnemonic)
                 setIsLoading(false)
                 setIsCreateWalletPopupOpen(true)
+                console.log("dashboardtoken", token)
                 fetchUserDashboard(token)
                     .then((data) => {
                         const fetchTonWalletAddress = data.data.tonWalletAddress;
@@ -50,6 +54,7 @@ export default function PBRWallet({ signature }) {
     }
 
     useEffect(() => {
+
         const authToken = getCookie('authToken');
         const metaSign = getCookie('metamaskSignature');
         setmetamaskSignature(metaSign)
@@ -73,7 +78,7 @@ export default function PBRWallet({ signature }) {
     useEffect(() => {
         if (token && address && isConnected) {
             const timeoutId = setTimeout(() => {
-
+                console.log("dashboardtokenxxx", token)
                 fetchUserDashboard(token)
                     .then((data) => {
                         const fetchTonWalletAddress = data.data.tonWalletAddress;
@@ -91,10 +96,32 @@ export default function PBRWallet({ signature }) {
     }, [token, address]);
 
 
+    const handleFinalizeWallet = () => {
+        setIsCreateWalletPopupOpen(false); // close the popup
+    };
 
-    if(isLoading) {return(
-        <TransactionPendingOverlay />
-    )}
+    if (isCreateWalletPopupOpen) {
+        return (
+            <CreatePBRWallet
+                data={walletData}
+                onFinalize={handleFinalizeWallet} />
+        )
+
+    }
+
+
+    if (isLoading) {
+        return (
+            <TransactionPendingOverlay />
+        )
+    }
+
+
+    if (!isConnected) {
+        return (
+            <div></div>
+        )
+    }
 
 
     return (
@@ -120,8 +147,6 @@ export default function PBRWallet({ signature }) {
 
                         <a href={`https://tonscan.org/address/${tonPbrWalletAddress}`} className="flex items-center">
                             <span className="mr-1 bg-pbr-yellow-dark px-2 rounded-lg">{tonPbrWalletAddress != "TON wallet not linked" ? `PBR Wallet: ${tonPbrWalletAddress.slice(0, 15)}...${tonPbrWalletAddress.slice(-4)}` : '-'}</span>
-
-
 
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="48" color="#000000" fill="none">
                                 <path d="M11.0991 3.00012C7.45013 3.00669 5.53932 3.09629 4.31817 4.31764C3.00034 5.63568 3.00034 7.75704 3.00034 11.9997C3.00034 16.2424 3.00034 18.3638 4.31817 19.6818C5.63599 20.9999 7.75701 20.9999 11.9991 20.9999C16.241 20.9999 18.3621 20.9999 19.6799 19.6818C20.901 18.4605 20.9906 16.5493 20.9972 12.8998" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />

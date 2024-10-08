@@ -3,19 +3,24 @@
 import { useState, useEffect } from 'react';
 
 import { useWeb3Modal, useWalletInfo } from "@web3modal/wagmi/react";
-import { useAccount, useSignMessage } from 'wagmi';
+import { useAccount, useSignMessage, useDisconnect  } from 'wagmi';
 import { authenticateMetaMask } from "../lib/api"
 import { setCookie, getCookie, deleteCookie } from 'cookies-next';
 
 import Image from 'next/image';
+import { TransactionPendingOverlay } from './TransactionPendingOverlay';
 
 export default function WalletConnectButton({ setSignature }) {
     const { walletInfo } = useWalletInfo()
     const { open } = useWeb3Modal();
     const { address, isConnected } = useAccount();
     const { signMessageAsync } = useSignMessage();
+    const { disconnect } = useDisconnect();
+
+    const [isLoading, setisLoading] = useState(false);
+    
     const [token, setToken] = useState(null);
-   
+
 
     const signWallet = async () => {
         const message = `Sign this message to authenticate with MetaMask`;
@@ -24,14 +29,16 @@ export default function WalletConnectButton({ setSignature }) {
             const signatureResult = await signMessageAsync({ message });
             setSignature(signatureResult);
 
+            setisLoading(true)
             const response = await authenticateMetaMask(address, signatureResult);
 
             if (response.success) {
                 setCookie('authToken', response.token, { maxAge: 60 * 60 * 24, httpOnly: false });
                 setCookie('metamaskSignature', signatureResult, { maxAge: 60 * 60 * 24, httpOnly: false });
-
+                setisLoading(false)
             } else {
                 console.error('Authentication failed.');
+                disconnect()
             }
         } catch (error) {
             console.error('Error signing message:', error);
@@ -45,7 +52,7 @@ export default function WalletConnectButton({ setSignature }) {
 
 
     useEffect(() => {
-    
+
         const timeoutId = setTimeout(() => {
             if (isConnected && address && !token) {
                 console.log("logged true", isConnected);
@@ -55,14 +62,20 @@ export default function WalletConnectButton({ setSignature }) {
                 deleteCookie('authToken')
                 deleteCookie('metamaskSignature')
                 setToken("")
+                
             }
         }, 2000); // Delay by 100ms (or adjust as needed)
-    
+
         return () => clearTimeout(timeoutId); // Clean up timeout on unmount
-    
+
     }, [isConnected, address]);
 
- 
+
+    if(isLoading){
+        return (
+           < TransactionPendingOverlay message="The Bear is authenticating your account. Please wait.." />
+        )
+    }
 
     return (
 
