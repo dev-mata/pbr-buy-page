@@ -40,9 +40,6 @@ export const metadata = {
 };
 
 
-
-
-
 export const TonConnectProvider = ({ children }) => (
   <TonConnectUIProvider manifestUrl={manifestUrl}>
     {children}

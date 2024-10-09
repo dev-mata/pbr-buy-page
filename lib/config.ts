@@ -5,9 +5,9 @@ import { bsc, polygon } from '@wagmi/core/chains'
 import { mainnet, sepolia } from 'wagmi/chains'
 import { walletConnect } from 'wagmi/connectors'
 
-export const projectId = process.env.WALLET_CONNECT_API_KEY || '5dd9b369ae173a94f01e196fa27a067f';
+export const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_API_KEY ;
  
- 
+
 const metadata = {
   name: "Pumping Bear Coin (PBR)",
   description: "Pumping Bear Coin (PBR) is a revolutionary TON memecoin that thrives in any market. Join our community-driven pumps, enjoy low fees &amp; fast transactions, and be part of the memecoin revolution!",
@@ -38,6 +38,7 @@ export const config2 = createConfig({
   transports: {
     [mainnet.id]: http(),
     [sepolia.id]: http('https://rpc2.sepolia.org'),
+    // [bsc.id]: http(),
   },
 })
 

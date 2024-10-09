@@ -23,6 +23,7 @@ import { useAccount, useBalance, useReadContract } from 'wagmi';
 const USDT_DECIMALS = 6;
 const DEBOUNCE_DELAY = 500;
 const USDT_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_USDT_SEPOLIA_CONTRACT_ADDRESS
+
 const recipientAddress = process.env.NEXT_PUBLIC_ETH_SEPOLIA_MASTER_WALLET //create network condition here
 
 export default function PurchaseForm() {
@@ -46,13 +47,13 @@ export default function PurchaseForm() {
         enabled: selectedToken === 'eth' && isConnected,  // Only fetch when ETH is selected
     });
 
-    // Fetch USDT balance
+  
     const { data: usdtBalance } = useReadContract({
         address: USDT_CONTRACT_ADDRESS,
         abi: erc20ABI,
         functionName: 'balanceOf',
         args: [address],
-        enabled: selectedToken === 'usdt' && isSepolia && isConnected,  // Only fetch when USDT is selected
+        enabled: selectedToken === 'usdt' && isConnected,  // Only fetch when USDT is selected
     });
 
 
@@ -60,7 +61,7 @@ export default function PurchaseForm() {
         address: USDT_CONTRACT_ADDRESS,
         abi: erc20ABI,
         functionName: 'name',
-        enabled: isSepolia && isConnected,
+        enabled: isConnected,
     });
 
 
@@ -69,7 +70,7 @@ export default function PurchaseForm() {
         abi: erc20ABI,
         functionName: 'balanceOf',
         args: [address],
-        enabled: isSepolia && isConnected,
+        enabled: isConnected,
     });
 
 
