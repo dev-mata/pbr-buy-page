@@ -6,22 +6,29 @@ import Image from "next/image";
 import pbrGuy from "../public/assets/pbr-guy.png"
 import bearIcon from "../public/assets/bearIcon.svg"
 import PurchaseForm from "../components/PurchaseForm"
+import MobileHeader from "../components/MobileHeader"
+
 
 export default function Home() {
 
   return (
     <>
 
-      <div className=" bg-pbr-yellow flex items-center justify-center">
+      <div className=" bg-pbr-yellow flex items-center justify-center font-londrina">
         <div className="mt-[5rem] md:mt-[10rem]">
+       
+       <MobileHeader />
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl w-full p-6">
 
-            <div className="relative col-span-2 bg-pbr-yellow-light border-solid border-2 border-black rounded-2xl p-6 text-black font-londrina">
+          
+
+            <div className="relative mt-[6rem] md:mt-[0rem] col-span-2 bg-pbr-yellow-light border-solid border-2 border-black rounded-2xl p-6 text-black  order-2 md:order-1">
 
               <Image src={pbrGuy} alt="pbr-guy" className="absolute -top-[118px] left-3" />
               <div className="space-y-6 mt-6">
 
-          
+
           
                 <div className="flex items-start">
                   <div className="flex-shrink-0">

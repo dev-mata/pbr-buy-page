@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 import { useWeb3Modal, useWalletInfo } from "@web3modal/wagmi/react";
-import { useAccount, useSignMessage, useDisconnect  } from 'wagmi';
+import { useAccount, useSignMessage, useDisconnect } from 'wagmi';
 import { authenticateMetaMask } from "../lib/api"
 import { setCookie, getCookie, deleteCookie } from 'cookies-next';
 
@@ -18,7 +18,7 @@ export default function WalletConnectButton({ setSignature }) {
     const { disconnect } = useDisconnect();
 
     const [isLoading, setisLoading] = useState(false);
-    
+
     const [token, setToken] = useState(null);
 
 
@@ -62,7 +62,7 @@ export default function WalletConnectButton({ setSignature }) {
                 deleteCookie('authToken')
                 deleteCookie('metamaskSignature')
                 setToken("")
-                
+
             }
         }, 2000); // Delay by 100ms (or adjust as needed)
 
@@ -71,9 +71,9 @@ export default function WalletConnectButton({ setSignature }) {
     }, [isConnected, address]);
 
 
-    if(isLoading){
+    if (isLoading) {
         return (
-           < TransactionPendingOverlay message="The Bear is authenticating your account. Please wait.." />
+            < TransactionPendingOverlay message="The Bear is authenticating your account. Please wait.." />
         )
     }
 
@@ -89,7 +89,7 @@ export default function WalletConnectButton({ setSignature }) {
                 <path d="M10 7H16C18.8284 7 20.2426 7 21.1213 7.87868C22 8.75736 22 10.1716 22 13V15C22 17.8284 22 19.2426 21.1213 20.1213C20.2426 21 18.8284 21 16 21H10C6.22876 21 4.34315 21 3.17157 19.8284C2 18.6569 2 16.7712 2 13V11C2 7.22876 2 5.34315 3.17157 4.17157C4.34315 3 6.22876 3 10 3H14C14.93 3 15.395 3 15.7765 3.10222C16.8117 3.37962 17.6204 4.18827 17.8978 5.22354C18 5.60504 18 6.07003 18 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>}
 
-            <span>
+            <span className={`flex items-center justify-start whitespace-nowrap overflow-hidden text-ellipsis max-w-full ${isConnected ? 'text-base md:text-md' : ''}`}>
                 {isConnected ? `Connected: ${address.slice(0, 6)}...${address.slice(-4)}` : 'Connect Wallet'}
             </span>
         </button>

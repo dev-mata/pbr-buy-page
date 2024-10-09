@@ -94,7 +94,7 @@ export default function PurchaseForm() {
 
 
     useEffect(() => {
-        if(isConnected){
+        if (isConnected) {
             if (selectedToken === 'eth' && ethBalance) {
                 setBalance(ethBalance.formatted);
                 setTokenName('ETH');
@@ -104,10 +104,10 @@ export default function PurchaseForm() {
                 setBalance(usdtNumberBalance);
                 setTokenName('USDT');
             }
-        }else{
+        } else {
             setBalance(0);
         }
-       
+
     }, [selectedToken, ethBalance, usdtBalance]);
 
 
@@ -137,7 +137,7 @@ export default function PurchaseForm() {
 
     return (
 
-        <div className={`bg-pbr-blue text-white rounded-2xl p-6 font-londrina font-light`}>
+        <div className={` bg-pbr-blue text-white rounded-2xl col-span-2 md:col-span-1  p-6 font-londrina font-light order-1 md:order-2 `}>
 
             <h2 className="text-2xl font-bold mb-4">Buy PBR now and start earning!</h2>
             <form className="space-y-4">
