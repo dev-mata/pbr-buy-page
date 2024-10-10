@@ -1,6 +1,7 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi";
 import { cookieStorage, createStorage } from "wagmi";
 import { http, createConfig } from '@wagmi/core'
+import { metaMask } from "wagmi/connectors";
 import { bsc, polygon } from '@wagmi/core/chains'
 import { mainnet, sepolia } from 'wagmi/chains'
 import { walletConnect } from 'wagmi/connectors'
@@ -30,10 +31,11 @@ const metadata = {
 export const config2 = createConfig({
   chains: [mainnet, sepolia],
   ssr: true,
-  connectors: [
+  connectors: [ 
     walletConnect({
       projectId: '5dd9b369ae173a94f01e196fa27a067f',
     }),
+    // metaMask(),
   ],
   transports: {
     [mainnet.id]: http(),
