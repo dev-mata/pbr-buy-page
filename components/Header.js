@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "../public/assets/pbr-logo.svg"
@@ -6,10 +6,13 @@ import WalletConnectButton from "./WalletConnectButton";
 import PBRWallet from "./PBRWallet";
 
 
-export default function Header({ setIsTransactionOpen }) {
+export default function Header({ setIsTransactionOpen, userDashboardData, refreshDashboardData  }) {
   const [signature, setSignature] = useState("");
 
+  const [passedOnUserDashboard, setPassedOnUserDashboard] = useState();
 
+
+ 
 
   const handleSignature = (signatureResult) => {
     setSignature(signatureResult);
@@ -24,6 +27,13 @@ export default function Header({ setIsTransactionOpen }) {
   };
 
 
+  useEffect(() => {
+    setPassedOnUserDashboard(userDashboardData)
+  }, [userDashboardData]);
+
+  console.log("userDashboardDataxxxxx", passedOnUserDashboard)
+
+  
   return (
     <header className="bg-pbr-yellow shadow-md p-4 font-londrina">
       <div className="container mx-auto flex justify-between items-center">
@@ -47,8 +57,9 @@ export default function Header({ setIsTransactionOpen }) {
           </div>
 
           <Link href="/leaderboard" className="text-lg font-medium px-4 py-2 rounded-lg bg-pb-gray hover:bg-pbr-blue hover:text-white border-solid border-2 border-black">Leaderboard</Link>
-          <PBRWallet signature={signature} />
 
+          <PBRWallet userDashboardData={passedOnUserDashboard} refreshDashboardData={refreshDashboardData} />
+         
         </nav>
 
 

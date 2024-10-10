@@ -5,11 +5,9 @@ import { useWalletInfo } from "@web3modal/wagmi/react";
 import PBRWallet from './PBRWallet';
 import Image from 'next/image';
 
-export default function MobileHeader() {
+export default function MobileHeader({  userDashboardData, refreshDashboardData  }) {
     const { address, isConnected } = useAccount();
     const { walletInfo } = useWalletInfo()
-
-    console.log("header address", address)
 
 
     return (
@@ -20,9 +18,9 @@ export default function MobileHeader() {
             </svg>}
             {address} */}
 
-            <div>
-                < PBRWallet />
-            </div>
+            {/* <div>
+                < PBRWallet refreshDashboardData={refreshDashboardData} userDashboardData={userDashboardData}/>
+            </div> */}
         </div>
     )
 

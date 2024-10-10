@@ -117,7 +117,7 @@ export default function PurchaseForm() {
             if (debouncedAmount > 0) {
                 try {
 
-                    const result = await convertPbrPurchase(1, selectedToken, debouncedAmount);
+                    const result = await convertPbrPurchase(1, selectedToken, debouncedAmount, chain.name.toLowerCase());
                     setPbrAmount(result.convertedAmount.bprTokens);
                 } catch (error) {
                     console.error('Error during purchase:', error);

@@ -18,7 +18,6 @@ export default function WalletConnectButton({ setSignature }) {
     const { disconnect } = useDisconnect();
 
     const [isLoading, setisLoading] = useState(false);
-
     const [token, setToken] = useState(null);
 
 
@@ -35,6 +34,12 @@ export default function WalletConnectButton({ setSignature }) {
             if (response.success) {
                 setCookie('authToken', response.token, { maxAge: 60 * 60 * 24, httpOnly: false });
                 setCookie('metamaskSignature', signatureResult, { maxAge: 60 * 60 * 24, httpOnly: false });
+
+                // Dispatch an event to notify about the cookie change
+                const event = new Event('cookieChange');
+                window.dispatchEvent(event);
+
+
                 setisLoading(false)
             } else {
                 console.error('Authentication failed.');
@@ -64,9 +69,9 @@ export default function WalletConnectButton({ setSignature }) {
                 setToken("")
 
             }
-        }, 2000); // Delay by 100ms (or adjust as needed)
+        }, 2000);
 
-        return () => clearTimeout(timeoutId); // Clean up timeout on unmount
+        return () => clearTimeout(timeoutId);
 
     }, [isConnected, address]);
 

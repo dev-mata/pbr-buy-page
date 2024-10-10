@@ -22,7 +22,7 @@ export default function PurchaseButton({ purchaseAmount, selectedToken, recipien
   const handleSendEthTransaction = async () => {
 
     try {
-      setIsPending(true)
+     
       const ethTxHash = await sendTransaction(config2, {
         to: recipientAddress,
         value: parseEther(purchaseAmount),
@@ -47,7 +47,7 @@ export default function PurchaseButton({ purchaseAmount, selectedToken, recipien
           functionName: 'approve',
           args: [
             address,
-            BigInt(purchaseAmount) * BigInt(10 ** 6),
+            BigInt(purchaseAmount) * BigInt(10 ** 18),
           ],
           chainId: sepolia.id,
         });
@@ -75,7 +75,7 @@ export default function PurchaseButton({ purchaseAmount, selectedToken, recipien
           args: [
             address,
             USDT_MASTER_ADDRESS,
-            BigInt(purchaseAmount) * BigInt(10 ** 6),
+            BigInt(purchaseAmount) * BigInt(10 ** 18),
           ],
           chainId: sepolia.id,
         });
